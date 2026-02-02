@@ -1,0 +1,41 @@
+{
+    "@context": "http://iiif.io/api/presentation/3/context.json",
+    "id": "https://systemik-solutions.github.io/im-data-processing/output/RS22_02/RS22_02_annotation_collection.json",
+    "type": "AnnotationCollection",
+    "label": {
+        "en": [
+            "A Gāndhārī  Version of the Anattalakkhaṇa-sutta"
+        ]
+    },
+    "metadata": [
+        {
+            "label": {
+                "en": [
+                    "Type"
+                ]
+            },
+            "value": {
+                "en": [
+                    "Published"
+                ]
+            }
+        },
+        {
+            "label": {
+                "en": [
+                    "Owner"
+                ]
+            },
+            "value": {
+                "en": [
+                    "Stephanie Majcher"
+                ]
+            }
+        }
+    ],
+    "total": 906,
+    "first": {
+        "id": "https://systemik-solutions.github.io/im-data-processing/output/RS22_02/RS22_02_annotation_page_segments.json",
+        "type": "AnnotationPage"
+    }
+}
