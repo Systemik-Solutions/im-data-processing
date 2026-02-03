@@ -104,16 +104,21 @@
             color: var(--accent-color);
             border-bottom-color: var(--accent-color);
             background-color: var(--panel-bg);
+            color: var(--text-primary);
         }
 
-        /* Syllables List */
-        #syllables-list {
+        .tab:hover {
+            color: var(--text-primary);
+        }
+
+        /* Lists */
+        .list-container {
             flex: 1;
             overflow-y: auto;
             list-style: none;
         }
 
-        .syllable-item {
+        .list-item {
             padding: 0.75rem 1.5rem;
             border-bottom: 1px solid var(--border-color);
             cursor: pointer;
@@ -122,20 +127,23 @@
             align-items: center;
         }
 
-        .syllable-item:hover {
+        .list-item:hover {
             background-color: #2a2a2a;
         }
 
-        .syllable-item.selected {
+        .list-item.selected {
             background-color: var(--highlight-bg);
             border-left: 3px solid var(--accent-color);
             padding-left: calc(1.5rem - 3px);
             /* Adjust for border */
         }
 
-        .syllable-label {
+        .item-label {
             font-size: 1rem;
             font-weight: 400;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* Scrollbar styling */
@@ -163,14 +171,25 @@
             letter-spacing: 0.05em;
             color: var(--text-secondary);
             margin-bottom: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .metadata-header:first-child {
+            margin-top: 0;
         }
 
         .metadata-title {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 300;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .metadata-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
             margin-bottom: 1.5rem;
-            min-height: 2.4rem;
-            /* Prevent layout shift */
+            font-family: monospace;
         }
 
         .grapheme-table {
@@ -213,6 +232,47 @@
             justify-content: center;
             height: 100%;
         }
+
+        /* Breakdown List Styles */
+        .breakdown-list {
+            list-style: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .breakdown-list .list-item {
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+        }
+
+        .breakdown-list .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .scroll-top-btn {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .scroll-top-btn:hover {
+            transform: translateY(-2px);
+            background-color: var(--accent-hover);
+        }
     </style>
 </head>
 
@@ -226,72 +286,137 @@
     <!-- Top-Right Pane: Metadata -->
     <div id="metadata-pane">
         <div id="metadata-content" style="display: none;">
-            <div class="metadata-header">Selected Syllable</div>
-            <div class="metadata-title" id="meta-label"></div>
-
-            <div class="metadata-header">Grapheme Breakdown</div>
-            <table class="grapheme-table">
-                <thead>
-                    <tr>
-                        <th>Grapheme</th>
-                        <th>TCM</th>
-                        <th>URL</th>
-                    </tr>
-                </thead>
-                <tbody id="meta-breakdown">
-                    <!-- Rows will be injected here -->
-                </tbody>
-            </table>
+            <!-- Content Injected via JS -->
         </div>
         <div id="metadata-empty" class="empty-state">
-            Select a syllable to view details
+            Select an item to view details
         </div>
     </div>
 
-    <!-- Bottom-Right Pane: Syllables List -->
+    <!-- Bottom-Right Pane: Lists -->
     <div id="list-pane">
         <div class="tabs">
-            <div class="tab active">Syllables</div>
-            <!-- More tabs in future -->
+            <div class="tab active" data-tab="syllables">Syllables</div>
+            <div class="tab" data-tab="tokens">Tokens</div>
+            <div class="tab" data-tab="lines">Lines</div>
         </div>
-        <ul id="syllables-list">
-            <!-- Items injected here -->
-        </ul>
+
+        <ul id="syllables-list" class="list-container"></ul>
+        <ul id="tokens-list" class="list-container" style="display: none;"></ul>
+        <ul id="lines-list" class="list-container" style="display: none;"></ul>
+
+        <button id="scroll-top-btn" class="scroll-top-btn" title="Scroll to Top">
+            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="19" x2="12" y2="5"></line>
+                <polyline points="5 12 12 5 19 12"></polyline>
+            </svg>
+        </button>
     </div>
 
-    <!-- Cylinder Viewer Script -->
+    <!-- Glycerine Viewer Script -->
     <script src="https://unpkg.com/glycerine-viewer@latest/jslib/glycerine-viewer.umd.cjs"></script>
 
     <script>
         const MANIFEST_URL = 'https://systemik-solutions.github.io/im-data-processing/output/RS22_02/RS22_02_manifest.json';
-        const ANNOTATION_URL = 'output/RS22_02/RS22_02_annotation_page_segments.json';
+        const ANNOTATION_URL_SEGMENTS = 'output/RS22_02/RS22_02_annotation_page_segments.json';
+        const ANNOTATION_URL_TOKENS = 'output/RS22_02/RS22_02_annotation_page_tokens.json';
+        const ANNOTATION_URL_LINES = 'output/RS22_02/RS22_02_annotation_page_lines.json';
 
         let viewer;
-        let annotations = []; // Normalized data
+        let syllablesMap = new Map(); // id -> syllable object
+        let tokens = []; // Array of token objects
+        let lines = []; // Array of line objects
+
+        let activeTab = 'syllables'; // 'syllables', 'tokens', 'lines'
+        let selectedSyllableId = null;
+        let selectedTokenId = null;
+        let selectedLineId = null; // Track line selection
 
         // DOM Elements
         const syllablesListEl = document.getElementById('syllables-list');
+        const tokensListEl = document.getElementById('tokens-list');
+        const linesListEl = document.getElementById('lines-list');
+        const scrollBtnEl = document.getElementById('scroll-top-btn');
         const metadataContentEl = document.getElementById('metadata-content');
         const metadataEmptyEl = document.getElementById('metadata-empty');
-        const metaLabelEl = document.getElementById('meta-label');
-        const metaBreakdownEl = document.getElementById('meta-breakdown');
+        const tabsContainer = document.querySelector('.tabs');
 
         async function init() {
+            // Setup Tabs
+            setupTabs();
+
             // 1. Initialize Viewer
             initViewer();
 
             // 2. Fetch and Parse Data
-            await loadAnnotations();
+            await loadData();
 
-            // 3. Render List
+            // 3. Render Lists
             renderSyllables();
+            renderTokens();
+            renderLines();
+
+            // 4. Scroll Support
+            setupScrollBtn();
+        }
+
+        function setupScrollBtn() {
+            scrollBtnEl.addEventListener('click', () => {
+                if (activeTab === 'syllables') syllablesListEl.scrollTo({ top: 0, behavior: 'smooth' });
+                else if (activeTab === 'tokens') tokensListEl.scrollTo({ top: 0, behavior: 'smooth' });
+                else if (activeTab === 'lines') linesListEl.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        function setupTabs() {
+            tabsContainer.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    switchTab(tab.dataset.tab);
+                });
+            });
+        }
+
+        function switchTab(tabName) {
+            if (activeTab === tabName) return;
+            activeTab = tabName;
+
+            // Update Header
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.tab === tabName);
+            });
+
+            // Update Lists
+            syllablesListEl.style.display = 'none';
+            tokensListEl.style.display = 'none';
+            linesListEl.style.display = 'none';
+
+            if (tabName === 'syllables') {
+                syllablesListEl.style.display = 'block';
+                if (selectedSyllableId) {
+                    showMetadataSyllable(syllablesMap.get(selectedSyllableId));
+                } else {
+                    showMetadata(null);
+                }
+            } else if (tabName === 'tokens') {
+                tokensListEl.style.display = 'block';
+                if (selectedTokenId) {
+                    showMetadataToken(tokens.find(t => t.id === selectedTokenId));
+                } else {
+                    showMetadata(null);
+                }
+            } else if (tabName === 'lines') {
+                linesListEl.style.display = 'block';
+                if (selectedLineId) {
+                    showMetadataLine(lines.find(l => l.id === selectedLineId));
+                } else {
+                    showMetadata(null);
+                }
+            }
         }
 
         function initViewer() {
             const ele = document.getElementById('glycerine-viewer');
-            // Assuming the container needs explicit dimensions or it fills parent. 
-            // In grid, the parent #viewer-pane has 100% height/width of cell.
-            // We pass '100%' for width/height.
             viewer = new GlycerineViewer(ele, {
                 manifest: MANIFEST_URL,
                 width: '100%',
@@ -304,29 +429,60 @@
                 showSettingPaneButton: false,
                 showCollectionPaneButton: false,
                 showPlayControls: false,
-                // Optional: Hide default info panel if requested to be cleaner, 
-                // but user didn't specify. Keeping defaults.
             });
             viewer.init();
         }
 
-        async function loadAnnotations() {
+        async function loadData() {
             try {
-                const response = await fetch(ANNOTATION_URL);
-                const data = await response.json();
+                // 1. Load Segments (Syllables)
+                const segResponse = await fetch(ANNOTATION_URL_SEGMENTS);
+                const segData = await segResponse.json();
+                const segItems = segData.items || [];
 
-                // Navigate to items: AnnotationPage -> items -> Annotation[]
-                const items = data.items || [];
+                segItems.forEach(item => {
+                    const processed = processSyllable(item);
+                    if (processed) {
+                        syllablesMap.set(processed.id, processed);
+                    }
+                });
 
-                annotations = items.map(processAnnotation).filter(item => item !== null);
+                // 2. Load Tokens
+                const tokResponse = await fetch(ANNOTATION_URL_TOKENS);
+                const tokData = await tokResponse.json();
+                const tokItems = tokData.items || [];
+
+                tokens = tokItems.map(processToken).filter(t => t !== null);
+
+                // 3. Load Lines
+                const linesResponse = await fetch(ANNOTATION_URL_LINES);
+                const linesData = await linesResponse.json();
+                const linesItems = linesData.items || [];
+
+                lines = linesItems.map(processLine).filter(l => l !== null);
 
             } catch (err) {
-                console.error("Failed to load annotations:", err);
+                console.error("Failed to load data:", err);
             }
         }
 
-        function processAnnotation(annotation) {
-            // Check body for Graphemes
+        function getBodyValue(annotation, label) {
+            let bodies = Array.isArray(annotation.body) ? annotation.body : [annotation.body];
+            for (let body of bodies) {
+                if (body.type === 'TextualBody' && body.format === 'text/html') {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(body.value, 'text/html');
+                    const labelEl = doc.querySelector('.field-label');
+                    if (labelEl && labelEl.textContent.trim() === label) {
+                        const valEl = doc.querySelector('.field-value');
+                        return valEl ? valEl.textContent.trim() : null;
+                    }
+                }
+            }
+            return null;
+        }
+
+        function processSyllable(annotation) {
             if (!annotation.body) return null;
 
             const graphemes = [];
@@ -334,7 +490,6 @@
 
             bodies.forEach(body => {
                 if (body.type === 'TextualBody' && body.format === 'text/html') {
-                    // Simple parsing using DOMParser
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(body.value, 'text/html');
 
@@ -357,7 +512,6 @@
             });
 
             if (graphemes.length === 0) return null;
-
             const label = graphemes.map(g => g.value).join('');
 
             return {
@@ -367,70 +521,257 @@
             };
         }
 
+        function processToken(annotation) {
+            const offsetVal = getBodyValue(annotation, 'Offset');
+            const offset = parseInt(offsetVal, 10) || 0;
+
+            let targets = [];
+            if (Array.isArray(annotation.target)) {
+                targets = annotation.target;
+            } else if (annotation.target) {
+                targets = [annotation.target];
+            }
+
+            const targetSyllables = targets.map(id => syllablesMap.get(id)).filter(s => s);
+            if (targetSyllables.length === 0) return null;
+
+            // Concatenate Graphemes with Offset Logic
+            let allGraphemes = [];
+            targetSyllables.forEach(s => {
+                allGraphemes = allGraphemes.concat(s.graphemes);
+            });
+
+            let finalGraphemes = [...allGraphemes];
+            if (offset > 0) {
+                finalGraphemes = finalGraphemes.slice(offset);
+            } else if (offset < 0) {
+                finalGraphemes = finalGraphemes.slice(0, offset);
+            }
+
+            const label = finalGraphemes.map(g => g.value).join('');
+
+            return {
+                id: annotation.id,
+                label: label,
+                syllables: targetSyllables,
+                offset: offset,
+                graphemes: finalGraphemes,
+                syllableIds: new Set(targetSyllables.map(s => s.id))
+            };
+        }
+
+        function processLine(annotation) {
+            const lineLabel = getBodyValue(annotation, 'Label') || '';
+
+            let targets = [];
+            if (Array.isArray(annotation.target)) {
+                targets = annotation.target;
+            } else if (annotation.target) {
+                targets = [annotation.target];
+            }
+
+            // Find overlapping tokens
+            // A token is in the line if it shares any syllables (segments) with the line's target segments
+            // Actually usually logic is: if the token is *fully* within or partially?
+            // Given the user said "separate each token by space", we want the sequence of tokens.
+            // We iterate all tokens and check intersection.
+
+            const lineSegmentIds = new Set(targets);
+
+            const lineTokens = tokens.filter(token => {
+                // Check if *any* of the token's syllable IDs are in the line's segment Set
+                // Using Set intersection
+                for (let s of token.syllables) {
+                    if (lineSegmentIds.has(s.id)) return true;
+                }
+                return false;
+            });
+
+            const tokenText = lineTokens.map(t => t.label).join(' ');
+            const fullLabel = `${lineLabel} ${tokenText}`;
+
+            return {
+                id: annotation.id,
+                label: fullLabel, // Selection List Label
+                lineNo: lineLabel,
+                text: tokenText,
+                tokens: lineTokens,
+                segments: targets // Raw segment IDs for viewer
+            };
+        }
+
+        // --- Render ---
+
         function renderSyllables() {
             syllablesListEl.innerHTML = '';
-
-            annotations.forEach(item => {
-                const li = document.createElement('li');
-                li.className = 'syllable-item';
-                li.innerHTML = `<span class="syllable-label">${item.label}</span>`;
-
-                li.addEventListener('click', () => {
-                    selectSyllable(li, item);
-                });
-
+            syllablesMap.forEach(item => {
+                const li = createListItem(item.id, item.label, item.label, () => selectSyllable(item.id));
                 syllablesListEl.appendChild(li);
             });
         }
 
-        let selectedId = null;
+        function renderTokens() {
+            tokensListEl.innerHTML = '';
+            tokens.forEach(item => {
+                const li = createListItem(item.id, item.label, item.label, () => selectToken(item));
+                tokensListEl.appendChild(li);
+            });
+        }
 
-        function selectSyllable(liElement, item) {
-            // Toggle logic
-            if (selectedId === item.id) {
-                // Deselect
-                selectedId = null;
-                viewer.setAnnotationIdFilter(); // Reset filter (show all or default) - API says "call... with no parameter"
+        function renderLines() {
+            linesListEl.innerHTML = '';
+            lines.forEach(item => {
+                const labelHtml = `<b>${item.lineNo}</b> ${item.text}`;
+                const li = createListItem(item.id, labelHtml, item.label, () => selectLine(item));
+                linesListEl.appendChild(li);
+            });
+        }
 
-                // UI Visuals
-                document.querySelectorAll('.syllable-item').forEach(el => el.classList.remove('selected'));
+        function createListItem(id, labelHtml, titleText, onClick) {
+            const li = document.createElement('li');
+            li.className = 'list-item';
+            li.dataset.id = id;
+            li.innerHTML = `<span class="item-label" title="${titleText}">${labelHtml}</span>`;
+            li.addEventListener('click', onClick);
+            return li;
+        }
 
-                // Metadata
+        // --- Selection ---
+
+        function selectSyllable(id) {
+            if (activeTab !== 'syllables') switchTab('syllables');
+
+            if (selectedSyllableId === id) {
+                selectedSyllableId = null;
+                viewer.setAnnotationIdFilter();
+                updateSelectionUI(syllablesListEl, null);
                 showMetadata(null);
             } else {
-                // Select
-                selectedId = item.id;
-                // Docs: ids is array
-                viewer.setAnnotationIdFilter([item.id]);
-
-                // UI Visuals
-                document.querySelectorAll('.syllable-item').forEach(el => el.classList.remove('selected'));
-                liElement.classList.add('selected');
-
-                // Metadata
-                showMetadata(item);
+                selectedSyllableId = id;
+                viewer.setAnnotationIdFilter([id]);
+                updateSelectionUI(syllablesListEl, id);
+                showMetadataSyllable(syllablesMap.get(id));
             }
         }
 
-        function showMetadata(item) {
-            if (!item) {
+        function selectToken(item) {
+            if (activeTab !== 'tokens') switchTab('tokens');
+
+            if (selectedTokenId === item.id) {
+                selectedTokenId = null;
+                viewer.setAnnotationIdFilter();
+                updateSelectionUI(tokensListEl, null);
+                showMetadata(null);
+            } else {
+                selectedTokenId = item.id;
+                const segmentIds = item.syllables.map(s => s.id);
+                viewer.setAnnotationIdFilter(segmentIds);
+                updateSelectionUI(tokensListEl, item.id);
+                showMetadataToken(item);
+            }
+        }
+
+        function selectLine(item) {
+            if (activeTab !== 'lines') switchTab('lines');
+
+            if (selectedLineId === item.id) {
+                selectedLineId = null;
+                viewer.setAnnotationIdFilter();
+                updateSelectionUI(linesListEl, null);
+                showMetadata(null);
+            } else {
+                selectedLineId = item.id;
+                viewer.setAnnotationIdFilter(item.segments);
+                updateSelectionUI(linesListEl, item.id);
+                showMetadataLine(item);
+            }
+        }
+
+        function updateSelectionUI(listEl, id) {
+            listEl.querySelectorAll('.list-item').forEach(el => el.classList.remove('selected'));
+            if (id) {
+                const el = listEl.querySelector(`.list-item[data-id="${id}"]`);
+                if (el) {
+                    el.classList.add('selected');
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }
+
+        // --- Metadata ---
+
+        function showMetadata(content) {
+            if (!content) {
                 metadataContentEl.style.display = 'none';
                 metadataEmptyEl.style.display = 'flex';
                 return;
             }
+        }
 
+        function showMetadataSyllable(item) {
+            if (!item) return;
             metadataEmptyEl.style.display = 'none';
             metadataContentEl.style.display = 'block';
+            metadataContentEl.innerHTML = `
+                <div class="metadata-header">Selected Syllable</div>
+                <div class="metadata-title">${item.label}</div>
+                <div class="metadata-header">Grapheme Breakdown</div>
+                <table class="grapheme-table">
+                    <thead><tr><th>Grapheme</th><th>TCM</th><th>URL</th></tr></thead>
+                    <tbody>
+                        ${item.graphemes.map(g => `
+                            <tr>
+                                <td>${g.value}</td>
+                                <td>${g.tcm || '-'}</td>
+                                <td class="grapheme-link"><a href="${g.url}" target="_blank">Link</a></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
 
-            metaLabelEl.textContent = item.label;
+        function showMetadataToken(item) {
+            if (!item) return;
+            metadataEmptyEl.style.display = 'none';
+            metadataContentEl.style.display = 'block';
+            metadataContentEl.innerHTML = `
+                <div class="metadata-header">Selected Token</div>
+                <div class="metadata-title">${item.label}</div>
+                <div class="metadata-header">Syllable Breakdown</div>
+            `;
+            const list = document.createElement('ul');
+            list.className = 'breakdown-list';
+            item.syllables.forEach(s => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                li.innerHTML = `<span class="item-label">${s.label}</span>`;
+                li.addEventListener('click', (e) => { e.stopPropagation(); selectSyllable(s.id); });
+                list.appendChild(li);
+            });
+            metadataContentEl.appendChild(list);
+        }
 
-            metaBreakdownEl.innerHTML = item.graphemes.map(g => `
-                <tr>
-                    <td>${g.value}</td>
-                    <td>${g.tcm || '-'}</td>
-                    <td class="grapheme-link"><a href="${g.url}" target="_blank">Link</a></td>
-                </tr>
-            `).join('');
+        function showMetadataLine(item) {
+            if (!item) return;
+            metadataEmptyEl.style.display = 'none';
+            metadataContentEl.style.display = 'block';
+            metadataContentEl.innerHTML = `
+                <div class="metadata-header">Selected Line</div>
+                <div class="metadata-title">Line ${item.lineNo}</div>
+                <div class="metadata-subtitle">${item.text}</div>
+                <div class="metadata-header">Token Breakdown</div>
+            `;
+            const list = document.createElement('ul');
+            list.className = 'breakdown-list';
+            item.tokens.forEach(t => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                li.innerHTML = `<span class="item-label">${t.label}</span>`;
+                li.addEventListener('click', (e) => { e.stopPropagation(); selectToken(t); });
+                list.appendChild(li);
+            });
+            metadataContentEl.appendChild(list);
         }
 
         // Start
