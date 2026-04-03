@@ -191,14 +191,45 @@ while ($row = $stmt->fetch()) {
     $segmentIds[] = (int) $row['scl_id'];
 }
 
-// 4. Extract Tokens
+// 4. Extract Tokens (with compound concatenation)
+
+// Step 1: Get compounds and build mappings
+$stmt = $pdo->query("
+    SELECT cmp_id, cmp_component_ids
+    FROM compound
+    ORDER BY cmp_id
+");
+
+$compoundTokenOrder = []; // com_id => [tok_id, tok_id, ...] in order
+$tokenToCompound = [];    // tok_id => com_id (reverse lookup)
+
+while ($row = $stmt->fetch()) {
+    $comId = (int) $row['cmp_id'];
+    $componentIds = parsePostgresArray($row['cmp_component_ids']);
+    $tokIds = [];
+
+    foreach ($componentIds as $entity) {
+        if (preg_match('/tok:(\d+)/', $entity, $matches)) {
+            $tokId = (int) $matches[1];
+            $tokIds[] = $tokId;
+            $tokenToCompound[$tokId] = $comId;
+        }
+    }
+
+    $compoundTokenOrder[$comId] = $tokIds;
+}
+
+// Step 2: Get all tokens and build a lookup map
 $stmt = $pdo->query("
     SELECT tok_id, tok_grapheme_ids
     FROM token
     ORDER BY tok_id
 ");
 
+$tokenDataMap = []; // tok_id => validated grapheme ids
+
 while ($row = $stmt->fetch()) {
+    $tokId = (int) $row['tok_id'];
     $graphemeIds = parsePostgresArray($row['tok_grapheme_ids']);
     $validGraphemes = [];
 
@@ -209,12 +240,37 @@ while ($row = $stmt->fetch()) {
         }
     }
 
-    $token = [
-        'id' => (int) $row['tok_id'],
-        'graphemes' => $validGraphemes
+    $tokenDataMap[$tokId] = $validGraphemes;
+}
+
+// Step 3: Build compound tokens (concatenated graphemes in order)
+$processedCompounds = [];
+
+foreach ($compoundTokenOrder as $comId => $tokIds) {
+    $concatenatedGraphemes = [];
+
+    foreach ($tokIds as $tokId) {
+        if (isset($tokenDataMap[$tokId])) {
+            $concatenatedGraphemes = array_merge($concatenatedGraphemes, $tokenDataMap[$tokId]);
+        }
+    }
+
+    $targetData['tokens'][] = [
+        'id' => "cmp:$comId",
+        'graphemes' => $concatenatedGraphemes
     ];
 
-    $targetData['tokens'][] = $token;
+    $processedCompounds[$comId] = true;
+}
+
+// Step 4: Add standalone tokens (not part of any compound)
+foreach ($tokenDataMap as $tokId => $graphemes) {
+    if (!isset($tokenToCompound[$tokId])) {
+        $targetData['tokens'][] = [
+            'id' => $tokId,
+            'graphemes' => $graphemes
+        ];
+    }
 }
 
 // 5. Extract Lines

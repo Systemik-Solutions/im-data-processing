@@ -116,13 +116,15 @@ For example:
 
 #### 4. Tokens
 
-Get the list of tokens from the `token` table. Then add each token to the `tokens` array in the target 
-data. Each token object should have the following properties:
+The compounds from the database will be concatenated into tokens in the target data. Get a list of compounds from the `compound` table. Record the mapping of `com_id` and token IDs from the `cmp_component_ids` column. Note that each token ID is in the format of `tok:id` (e.g. `tok:1`). The order of token IDs in the `cmp_component_ids` column defines the order of tokens in the compound.
 
-- `id`: the `tok_id` column as is.
+Get the list of tokens from the `token` table. Then add each token to the `tokens` array in the target 
+data. Note that tokens from compounds need to be concatenated into a single token. Each token object should have the following properties:
+
+- `id`: the `tok_id` column as is. If the token is from a compound, use the compound ID in the format of `cmp:id` (e.g. `cmp:1`).
 - `graphemes`: the `tok_grapheme_ids` column. This column is an array of grapheme ids. Firstly validate
 each id in the array to make sure it exists in the `annotatedGraphemes` array in the target data. If it 
-is valid, add it to the `graphemes` property array. Otherwise, skip it.
+is valid, add it to the `graphemes` property array. Otherwise, skip it. If the token is from a compound, the grapheme ids should be the concatenation of the grapheme ids from all tokens in the compound.
 
 For example:
 
@@ -130,6 +132,15 @@ For example:
 {
     "id": 1,
     "graphemes": [1, 2, 3]
+}
+```
+
+For a compound token:
+
+```json
+{
+    "id": "cmp:1",
+    "graphemes": [1, 2, 3, 4, 5]
 }
 ```
 
