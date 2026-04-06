@@ -36,7 +36,8 @@ a list of entity objects.
     "tokens": [],
     "lines": [],
     "lemmas": [],
-    "inflections": []
+    "inflections": [],
+    "sequences": []
 }
 ```
 
@@ -315,6 +316,18 @@ For example:
     "images": [1, 2]
 }
 ```
+
+#### 9. Sequences
+
+Get the list of sequences from the `sequence` table where `seq_entity_ids` is not null. Another condition is that only include sequences where the resolved type term based on the `seq_type_id` is below the hierarchy of "Analysis" (trm_id = 740) in the `term` (including the "Analysis" term itself). For example, a sequence with type "Sentence" (trm_id = 745) is in the hierarchy (bottom-to-top) defined by the `trm_parent_id` column: "Paragraph" (trm_id = 744) -> "Section" (trm_id = 1437) -> "Chapter" (trm_id = 741) -> "Analysis" (trm_id = 740). Then add each sequence to the `sequences` array in the target data. Each sequence object should have the following properties:
+
+- `id`: the `seq_id` column as is.
+- `label`: the `seq_label` column as is.
+- `type`: use the value from the `seq_type_id` column to query the `term` table and get the term label.
+- `parent`: search the sequence where the `seq_entity_ids` column contains the current sequence. The `seq_entity_ids` column is an array of token/compound/sequence IDs where each item is in the format of `tok:id`, `cmp:id` or `seq:id` (e.g. `tok:1`, `cmp:1`, `seq:1`). If the current sequence ID is in the array, then the `id` of that sequence is the `parent` of the current sequence. Only search the sequences which will be included in the `sequences` array in the target data. If there is no such sequence or the parent sequence is not included in the `sequences` array in the target data, set the `parent` property to null.
+- `position`: the position of the sequence in the `seq_entity_ids` column of its parent sequence. Use the index (0-based) of the sequence ID in the `seq_entity_ids` array as the position. If the sequence is not in any parent sequence, set the `position` property to null.
+- `tokens`: use the array from the `seq_entity_ids` column, ignore the items with `seq:` prefix. For the items with `tok:` prefix, remove the prefix and validate the ID to make sure it exists in the `tokens` array in the target data. If it is valid, add numeric ID to the `tokens` property array. For the items with `cmp:` prefix, validate the string as is to make sure it exists in the `tokens` array in the target data. If it is valid, add it as is to the `tokens` property array. Make sure the order of tokens in the `tokens` property array is the same as the order in the `seq_entity_ids` column. If there is no valid token, set the `tokens` property to null.
+
 
 ### Notes
 

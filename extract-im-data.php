@@ -94,6 +94,48 @@ function parsePostgresArray($pgArray)
     return explode(',', $pgArray);
 }
 
+/**
+ * Helper function to get all descendant term IDs (including the ancestor itself)
+ */
+function getDescendantTermIds($pdo, $ancestorId)
+{
+    $stmt = $pdo->query("SELECT trm_id, trm_parent_id FROM term");
+    $rows = $stmt->fetchAll();
+
+    // Build parent -> children adjacency list
+    $children = [];
+    foreach ($rows as $row) {
+        $parentId = $row['trm_parent_id'] !== null ? (int) $row['trm_parent_id'] : null;
+        if ($parentId !== null) {
+            $children[$parentId][] = (int) $row['trm_id'];
+        }
+    }
+
+    // BFS from ancestorId
+    $descendants = [];
+    $queue = [$ancestorId];
+    $visited = [];
+
+    while (!empty($queue)) {
+        $current = array_shift($queue);
+        if (isset($visited[$current])) {
+            continue;
+        }
+        $visited[$current] = true;
+        $descendants[] = $current;
+
+        if (isset($children[$current])) {
+            foreach ($children[$current] as $childId) {
+                if (!isset($visited[$childId])) {
+                    $queue[] = $childId;
+                }
+            }
+        }
+    }
+
+    return $descendants;
+}
+
 // Initialize target data structure
 $targetData = [
     'texts' => [],
@@ -105,7 +147,8 @@ $targetData = [
     'tokens' => [],
     'lines' => [],
     'lemmas' => [],
-    'inflections' => []
+    'inflections' => [],
+    'sequences' => []
 ];
 
 // 1. Extract Graphemes (unique, deduplicated)
@@ -557,6 +600,101 @@ while ($row = $stmt->fetch()) {
     ];
 
     $targetData['texts'][] = $text;
+}
+
+// 11. Extract Sequences (Analysis hierarchy)
+
+// Build valid token ID lookup from extracted tokens
+$validTokenIds = [];
+foreach ($targetData['tokens'] as $token) {
+    $validTokenIds[$token['id']] = true;
+}
+
+// Get all term IDs that are descendants of "Analysis" (trm_id = 740), including 740 itself
+$analysisTermIds = getDescendantTermIds($pdo, 740);
+$analysisTermSet = array_flip($analysisTermIds);
+
+// Query all sequences with non-null entity IDs
+$stmt = $pdo->query("
+    SELECT seq_id, seq_label, seq_type_id, seq_entity_ids
+    FROM sequence
+    WHERE seq_entity_ids IS NOT NULL
+    ORDER BY seq_id
+");
+
+// Pass 1: Collect qualifying sequences
+$qualifyingSequences = [];
+
+while ($row = $stmt->fetch()) {
+    $typeId = $row['seq_type_id'] !== null ? (int) $row['seq_type_id'] : null;
+
+    // Only include sequences whose type is in the Analysis hierarchy
+    if ($typeId === null || !isset($analysisTermSet[$typeId])) {
+        continue;
+    }
+
+    $seqId = (int) $row['seq_id'];
+    $parsedEntities = parsePostgresArray($row['seq_entity_ids']);
+
+    // Build tokens array from entity IDs
+    $tokens = [];
+    foreach ($parsedEntities as $entity) {
+        $entity = trim($entity);
+        if (preg_match('/^tok:(\d+)$/', $entity, $matches)) {
+            $tokId = (int) $matches[1];
+            if (isset($validTokenIds[$tokId])) {
+                $tokens[] = $tokId;
+            }
+        } elseif (preg_match('/^cmp:\d+$/', $entity)) {
+            if (isset($validTokenIds[$entity])) {
+                $tokens[] = $entity;
+            }
+        }
+        // seq: entries are skipped for the tokens array
+    }
+
+    $qualifyingSequences[$seqId] = [
+        'label' => $row['seq_label'],
+        'type' => getTermLabel($pdo, $typeId),
+        'tokens' => !empty($tokens) ? $tokens : null,
+        'parsedEntities' => $parsedEntities
+    ];
+}
+
+// Pass 2: Build reverse index for parent/position resolution
+$childToParent = [];
+
+foreach ($qualifyingSequences as $seqId => $seqData) {
+    foreach ($seqData['parsedEntities'] as $index => $entity) {
+        $entity = trim($entity);
+        if (preg_match('/^seq:(\d+)$/', $entity)) {
+            $childToParent[$entity] = [
+                'parentId' => $seqId,
+                'position' => $index
+            ];
+        }
+    }
+}
+
+// Final assembly
+foreach ($qualifyingSequences as $seqId => $seqData) {
+    $parentInfo = $childToParent["seq:$seqId"] ?? null;
+    $parent = null;
+    $position = null;
+
+    if ($parentInfo && isset($qualifyingSequences[$parentInfo['parentId']])) {
+        $parent = $parentInfo['parentId'];
+        $position = $parentInfo['position'];
+    }
+
+    $targetData['sequences'][] = [
+        'id' => $seqId,
+        'label' => $seqData['label'],
+        'type' => $seqData['type'],
+        'parent' => $parent,
+        'position' => $position,
+        'tokens' => $seqData['tokens']
+    ];
 }
 
 // Output JSON

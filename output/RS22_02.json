@@ -18924,5 +18924,571 @@
             "verbal_mood": "opt.",
             "verbal_secondary_conjugation": null
         }
+    ],
+    "sequences": [
+        {
+            "id": 6,
+            "label": "text Structure for RS22-02",
+            "type": "Analysis",
+            "parent": null,
+            "position": null,
+            "tokens": null
+        },
+        {
+            "id": 53,
+            "label": "Sūtra",
+            "type": "Chapter",
+            "parent": 6,
+            "position": 1,
+            "tokens": null
+        },
+        {
+            "id": 58,
+            "label": "A",
+            "type": "Section",
+            "parent": 53,
+            "position": 1,
+            "tokens": null
+        },
+        {
+            "id": 59,
+            "label": "B",
+            "type": "Section",
+            "parent": 53,
+            "position": 2,
+            "tokens": null
+        },
+        {
+            "id": 60,
+            "label": "C",
+            "type": "Section",
+            "parent": 53,
+            "position": 3,
+            "tokens": null
+        },
+        {
+            "id": 68,
+            "label": "E",
+            "type": "Section",
+            "parent": 53,
+            "position": 5,
+            "tokens": null
+        },
+        {
+            "id": 69,
+            "label": "F",
+            "type": "Section",
+            "parent": 53,
+            "position": 6,
+            "tokens": null
+        },
+        {
+            "id": 70,
+            "label": null,
+            "type": "Sentence",
+            "parent": 58,
+            "position": 0,
+            "tokens": [
+                1,
+                2,
+                3
+            ]
+        },
+        {
+            "id": 71,
+            "label": null,
+            "type": "Sentence",
+            "parent": 58,
+            "position": 1,
+            "tokens": [
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10
+            ]
+        },
+        {
+            "id": 72,
+            "label": null,
+            "type": "Sentence",
+            "parent": 59,
+            "position": 0,
+            "tokens": [
+                11,
+                12,
+                13,
+                14,
+                15,
+                16
+            ]
+        },
+        {
+            "id": 73,
+            "label": null,
+            "type": "Sentence",
+            "parent": 59,
+            "position": 1,
+            "tokens": [
+                17,
+                18,
+                19
+            ]
+        },
+        {
+            "id": 74,
+            "label": null,
+            "type": "Sentence",
+            "parent": 59,
+            "position": 2,
+            "tokens": [
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41
+            ]
+        },
+        {
+            "id": 75,
+            "label": null,
+            "type": "Sentence",
+            "parent": 59,
+            "position": 3,
+            "tokens": [
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62
+            ]
+        },
+        {
+            "id": 76,
+            "label": null,
+            "type": "Sentence",
+            "parent": 59,
+            "position": 4,
+            "tokens": [
+                63,
+                64,
+                65,
+                66
+            ]
+        },
+        {
+            "id": 77,
+            "label": null,
+            "type": "Sentence",
+            "parent": 59,
+            "position": 5,
+            "tokens": [
+                67,
+                68,
+                69
+            ]
+        },
+        {
+            "id": 78,
+            "label": null,
+            "type": "Sentence",
+            "parent": 59,
+            "position": 6,
+            "tokens": [
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87,
+                88,
+                89,
+                90,
+                91,
+                92
+            ]
+        },
+        {
+            "id": 79,
+            "label": null,
+            "type": "Sentence",
+            "parent": 59,
+            "position": 7,
+            "tokens": [
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+                115
+            ]
+        },
+        {
+            "id": 80,
+            "label": null,
+            "type": "Sentence",
+            "parent": 60,
+            "position": 0,
+            "tokens": [
+                116,
+                117,
+                118,
+                119,
+                120,
+                121,
+                122,
+                123
+            ]
+        },
+        {
+            "id": 81,
+            "label": null,
+            "type": "Sentence",
+            "parent": 60,
+            "position": 1,
+            "tokens": [
+                124,
+                125
+            ]
+        },
+        {
+            "id": 82,
+            "label": null,
+            "type": "Sentence",
+            "parent": 60,
+            "position": 2,
+            "tokens": [
+                126,
+                127,
+                128,
+                129,
+                130,
+                131
+            ]
+        },
+        {
+            "id": 83,
+            "label": null,
+            "type": "Sentence",
+            "parent": 60,
+            "position": 3,
+            "tokens": [
+                132,
+                133,
+                134
+            ]
+        },
+        {
+            "id": 84,
+            "label": null,
+            "type": "Sentence",
+            "parent": 60,
+            "position": 4,
+            "tokens": [
+                135,
+                136,
+                137,
+                138,
+                "cmp:1",
+                141,
+                142,
+                143,
+                144,
+                145,
+                146,
+                147,
+                148,
+                149,
+                150,
+                151,
+                152,
+                153
+            ]
+        },
+        {
+            "id": 85,
+            "label": null,
+            "type": "Sentence",
+            "parent": 60,
+            "position": 5,
+            "tokens": [
+                154,
+                155,
+                156
+            ]
+        },
+        {
+            "id": 86,
+            "label": null,
+            "type": "Sentence",
+            "parent": 60,
+            "position": 6,
+            "tokens": [
+                157,
+                158,
+                159,
+                160,
+                161,
+                162,
+                163,
+                164
+            ]
+        },
+        {
+            "id": 87,
+            "label": null,
+            "type": "Sentence",
+            "parent": 60,
+            "position": 7,
+            "tokens": [
+                165,
+                166,
+                167
+            ]
+        },
+        {
+            "id": 88,
+            "label": null,
+            "type": "Sentence",
+            "parent": 60,
+            "position": 8,
+            "tokens": [
+                168,
+                169,
+                170,
+                171,
+                172,
+                173,
+                174
+            ]
+        },
+        {
+            "id": 89,
+            "label": null,
+            "type": "Sentence",
+            "parent": 60,
+            "position": 9,
+            "tokens": [
+                175,
+                176,
+                177
+            ]
+        },
+        {
+            "id": 90,
+            "label": null,
+            "type": "Sentence",
+            "parent": 60,
+            "position": 10,
+            "tokens": [
+                178,
+                179,
+                180,
+                181,
+                "cmp:2",
+                184,
+                185,
+                186,
+                187,
+                188,
+                189,
+                190,
+                191,
+                192,
+                193,
+                194,
+                195,
+                196,
+                197
+            ]
+        },
+        {
+            "id": 91,
+            "label": null,
+            "type": "Sentence",
+            "parent": 60,
+            "position": 11,
+            "tokens": [
+                198,
+                199,
+                200
+            ]
+        },
+        {
+            "id": 92,
+            "label": null,
+            "type": "Sentence",
+            "parent": 60,
+            "position": 12,
+            "tokens": [
+                201,
+                202,
+                203,
+                204
+            ]
+        },
+        {
+            "id": 93,
+            "label": null,
+            "type": "Sentence",
+            "parent": 68,
+            "position": 0,
+            "tokens": [
+                205,
+                206,
+                207,
+                208,
+                209,
+                210,
+                211,
+                212,
+                214,
+                215,
+                216,
+                217,
+                218,
+                219,
+                222,
+                223,
+                224,
+                225,
+                226,
+                227,
+                228,
+                231,
+                232,
+                233,
+                234
+            ]
+        },
+        {
+            "id": 94,
+            "label": null,
+            "type": "Sentence",
+            "parent": 68,
+            "position": 1,
+            "tokens": [
+                235,
+                236,
+                237,
+                239,
+                240,
+                241,
+                242,
+                265,
+                243,
+                244,
+                245,
+                246,
+                247
+            ]
+        },
+        {
+            "id": 95,
+            "label": null,
+            "type": "Sentence",
+            "parent": 69,
+            "position": 0,
+            "tokens": [
+                248,
+                249,
+                250,
+                251,
+                252,
+                253,
+                254,
+                255,
+                256,
+                257
+            ]
+        },
+        {
+            "id": 96,
+            "label": null,
+            "type": "Sentence",
+            "parent": 69,
+            "position": 1,
+            "tokens": [
+                258,
+                259,
+                260
+            ]
+        },
+        {
+            "id": 97,
+            "label": null,
+            "type": "Sentence",
+            "parent": 69,
+            "position": 2,
+            "tokens": [
+                261,
+                262,
+                263
+            ]
+        }
     ]
 }
