@@ -34,7 +34,9 @@ a list of entity objects.
     "annotatedGraphemes": [],
     "segments": [],
     "tokens": [],
-    "lines": []
+    "lines": [],
+    "lemmas": [],
+    "inflections": []
 }
 ```
 
@@ -114,6 +116,76 @@ For example:
 }
 ```
 
+#### 4. Inflections
+
+Get the list of inflections from the `inflection` table where `inf_component_ids` is not null. Then add each inflection to the `inflections` array in the target data. Each inflection object should have the following properties:
+
+- `id`: the `inf_id` column as is.
+- `case`: use the value from the `inf_case_id` column to query the `term` table and get the term label.
+- `nominal_gender`: use the value from the `inf_nominal_gender_id` column to query the `term` table and get the term label.
+- `grammatical_number`: use the value from the `inf_gram_number_id` column to query the `term` table and get the term label.
+- `verbal_person`: use the value from the `inf_verb_person_id` column to query the `term` table and get the term label.
+- `verbal_voice`: use the value from the `inf_verb_voice_id` column to query the `term` table and get the term label.
+- `verbal_tense`: use the value from the `inf_verb_tense_id` column to query the `term` table and get the term label.
+- `verbal_mood`: use the value from the `inf_verb_mood_id` column to query the `term` table and get the term label.
+- `verbal_secondary_conjugation`: use the value from the `inf_verb_second_conj_id` column to query the `term` table and get the term label.
+
+For example:
+
+```json
+{
+    "id": 1,
+    "case": "nom.",
+    "nominal_gender": "m.",
+    "grammatical_number": "sg.",
+    "verbal_person": "3rd",
+    "verbal_voice": "P.",
+    "verbal_tense": "pres.",
+    "verbal_mood": "Indic.",
+    "verbal_secondary_conjugation": "caus."
+}
+```
+
+Use the column `inf_component_ids` to build a mapping of token IDs to inflection IDs which will be used when populating the token data. The `inf_component_ids` column is an array of token or compound ids. For example: `{tok:1,tok:2,cmp:1}`. If it references a compound ID, use the compound ID in the format of `cmp:id` (e.g. `cmp:1`) for the mapping as this will be the ID of the concatenated token in the `tokens` array.
+
+#### 5. Lemmas
+
+Get the list of segments from the `lemma` table where `lem_component_ids` is not null. Then add each lemma to the `lemmas` array in the target data. Each lemma object should have the following properties:
+
+- `id`: the `lem_id` column as is.
+- `value`: the `lem_value` column as is.
+- `translation`: the `lem_translation` column as is.
+- `homograph_order`: the `lem_homographorder` column as is.
+- `description`: the `lem_description` column as is.
+- `sort_code`: the `lem_sort_code` column as is.
+- `sort_code2`: the `lem_sort_code2` column as is.
+- `part_of_speech`: use the value from the `lem_part_of_speech_id` column to query the `term` table and get the term label.
+- `subpart_of_speech`: use the value from the `lem_subpart_of_speech_id` column to query the `term` table and get the term label.
+- `nominal_gender`: use the value from the `lem_nominal_gender_id` column to query the `term` table and get the term label.
+- `verbal_class`: use the value from the `lem_verb_class_id` column to query the `term` table and get the term label.
+- `declension`: use the value from the `lem_declension_id` column to query the `term` table and get the term label.
+
+For example:
+
+```json
+{
+    "id": 1,
+    "value": "rmiaḏava",
+    "translation": "Deer Park",
+    "homograph_order": 1,
+    "description": "Skt. mr̥gadāva, P migadāva",
+    "sort_code": "100",
+    "sort_code2": "100",
+    "part_of_speech": "v.",
+    "subpart_of_speech": "Finite",
+    "nominal_gender": "m.",
+    "verbal_class": "1",
+    "declension": "is"
+}
+```
+
+Use the column `lem_component_ids` to build a mapping of token IDs to lemma IDs which will be used when populating the token data. The `lem_component_ids` column is an array of mixture of token, inflection and compound ids. For example: `{tok:1,tok:2,cmp:1,inf:1}`. If it references a compound ID, use the compound ID in the format of `cmp:id` (e.g. `cmp:1`) for the mapping as this will be the ID of the concatenated token in the `tokens` array. If it references an inflection ID, it should be resolved to the token or compound IDs through the inflection. (See the inflection section above for how to resolve the inflection to token or compound IDs.)
+
 #### 4. Tokens
 
 The compounds from the database will be concatenated into tokens in the target data. Get a list of compounds from the `compound` table. Record the mapping of `com_id` and token IDs from the `cmp_component_ids` column. Note that each token ID is in the format of `tok:id` (e.g. `tok:1`). The order of token IDs in the `cmp_component_ids` column defines the order of tokens in the compound.
@@ -125,13 +197,17 @@ data. Note that tokens from compounds need to be concatenated into a single toke
 - `graphemes`: the `tok_grapheme_ids` column. This column is an array of grapheme ids. Firstly validate
 each id in the array to make sure it exists in the `annotatedGraphemes` array in the target data. If it 
 is valid, add it to the `graphemes` property array. Otherwise, skip it. If the token is from a compound, the grapheme ids should be the concatenation of the grapheme ids from all tokens in the compound.
+- `lemma`: use the mapping built from the `lemma` table to get the lemma ID for the token. Set to null if there is no lemma for the token.
+- `inflection`: use the mapping built from the `inflection` table to get the inflection ID for the token. Set to null if there is no inflection for the token.
 
 For example:
 
 ```json
 {
     "id": 1,
-    "graphemes": [1, 2, 3]
+    "graphemes": [1, 2, 3],
+    "lemma": 1,
+    "inflection": 1
 }
 ```
 
@@ -140,7 +216,9 @@ For a compound token:
 ```json
 {
     "id": "cmp:1",
-    "graphemes": [1, 2, 3, 4, 5]
+    "graphemes": [1, 2, 3, 4, 5],
+    "lemma": "1",
+    "inflection": "1"
 }
 ```
 

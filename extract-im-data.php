@@ -103,7 +103,9 @@ $targetData = [
     'annotatedGraphemes' => [],
     'segments' => [],
     'tokens' => [],
-    'lines' => []
+    'lines' => [],
+    'lemmas' => [],
+    'inflections' => []
 ];
 
 // 1. Extract Graphemes (unique, deduplicated)
@@ -191,7 +193,105 @@ while ($row = $stmt->fetch()) {
     $segmentIds[] = (int) $row['scl_id'];
 }
 
-// 4. Extract Tokens (with compound concatenation)
+// 4. Extract Inflections
+$stmt = $pdo->query("
+    SELECT inf_id, inf_case_id, inf_nominal_gender_id, inf_gram_number_id,
+           inf_verb_person_id, inf_verb_voice_id, inf_verb_tense_id,
+           inf_verb_mood_id, inf_verb_second_conj_id, inf_component_ids
+    FROM inflection
+    WHERE inf_component_ids IS NOT NULL
+    ORDER BY inf_id
+");
+
+$inflectionComponentMap = []; // inf_id => [tok:N, cmp:N, ...] for lemma resolution
+$tokenToInflection = [];      // tokenKey => inf_id
+
+while ($row = $stmt->fetch()) {
+    $infId = (int) $row['inf_id'];
+
+    $inflection = [
+        'id' => $infId,
+        'case' => getTermLabel($pdo, $row['inf_case_id']),
+        'nominal_gender' => getTermLabel($pdo, $row['inf_nominal_gender_id']),
+        'grammatical_number' => getTermLabel($pdo, $row['inf_gram_number_id']),
+        'verbal_person' => getTermLabel($pdo, $row['inf_verb_person_id']),
+        'verbal_voice' => getTermLabel($pdo, $row['inf_verb_voice_id']),
+        'verbal_tense' => getTermLabel($pdo, $row['inf_verb_tense_id']),
+        'verbal_mood' => getTermLabel($pdo, $row['inf_verb_mood_id']),
+        'verbal_secondary_conjugation' => getTermLabel($pdo, $row['inf_verb_second_conj_id'])
+    ];
+
+    $targetData['inflections'][] = $inflection;
+
+    // Parse inf_component_ids to build mappings
+    $componentIds = parsePostgresArray($row['inf_component_ids']);
+    $componentKeys = [];
+
+    foreach ($componentIds as $entity) {
+        $entity = trim($entity);
+        if (preg_match('/^(tok:\d+|cmp:\d+)$/', $entity)) {
+            $componentKeys[] = $entity;
+            $tokenToInflection[$entity] = $infId;
+        }
+    }
+
+    $inflectionComponentMap[$infId] = $componentKeys;
+}
+
+// 5. Extract Lemmas
+$stmt = $pdo->query("
+    SELECT lem_id, lem_value, lem_translation, lem_homographorder,
+           lem_description, lem_sort_code, lem_sort_code2,
+           lem_part_of_speech_id, lem_subpart_of_speech_id,
+           lem_nominal_gender_id, lem_verb_class_id, lem_declension_id,
+           lem_component_ids
+    FROM lemma
+    WHERE lem_component_ids IS NOT NULL
+    ORDER BY lem_id
+");
+
+$tokenToLemma = []; // tokenKey => lem_id
+
+while ($row = $stmt->fetch()) {
+    $lemId = (int) $row['lem_id'];
+
+    $lemma = [
+        'id' => $lemId,
+        'value' => $row['lem_value'],
+        'translation' => $row['lem_translation'],
+        'homograph_order' => $row['lem_homographorder'] !== null ? (int) $row['lem_homographorder'] : null,
+        'description' => $row['lem_description'],
+        'sort_code' => $row['lem_sort_code'],
+        'sort_code2' => $row['lem_sort_code2'],
+        'part_of_speech' => getTermLabel($pdo, $row['lem_part_of_speech_id']),
+        'subpart_of_speech' => getTermLabel($pdo, $row['lem_subpart_of_speech_id']),
+        'nominal_gender' => getTermLabel($pdo, $row['lem_nominal_gender_id']),
+        'verbal_class' => getTermLabel($pdo, $row['lem_verb_class_id']),
+        'declension' => getTermLabel($pdo, $row['lem_declension_id'])
+    ];
+
+    $targetData['lemmas'][] = $lemma;
+
+    // Parse lem_component_ids to build token-to-lemma mapping
+    $componentIds = parsePostgresArray($row['lem_component_ids']);
+
+    foreach ($componentIds as $entity) {
+        $entity = trim($entity);
+        if (preg_match('/^(tok:\d+|cmp:\d+)$/', $entity)) {
+            $tokenToLemma[$entity] = $lemId;
+        } elseif (preg_match('/^inf:(\d+)$/', $entity, $matches)) {
+            // Resolve inflection to its underlying token/compound keys
+            $infId = (int) $matches[1];
+            if (isset($inflectionComponentMap[$infId])) {
+                foreach ($inflectionComponentMap[$infId] as $key) {
+                    $tokenToLemma[$key] = $lemId;
+                }
+            }
+        }
+    }
+}
+
+// 6. Extract Tokens (with compound concatenation)
 
 // Step 1: Get compounds and build mappings
 $stmt = $pdo->query("
@@ -255,9 +355,12 @@ foreach ($compoundTokenOrder as $comId => $tokIds) {
         }
     }
 
+    $cmpKey = "cmp:$comId";
     $targetData['tokens'][] = [
-        'id' => "cmp:$comId",
-        'graphemes' => $concatenatedGraphemes
+        'id' => $cmpKey,
+        'graphemes' => $concatenatedGraphemes,
+        'lemma' => $tokenToLemma[$cmpKey] ?? null,
+        'inflection' => $tokenToInflection[$cmpKey] ?? null
     ];
 
     $processedCompounds[$comId] = true;
@@ -266,14 +369,17 @@ foreach ($compoundTokenOrder as $comId => $tokIds) {
 // Step 4: Add standalone tokens (not part of any compound)
 foreach ($tokenDataMap as $tokId => $graphemes) {
     if (!isset($tokenToCompound[$tokId])) {
+        $tokKey = "tok:$tokId";
         $targetData['tokens'][] = [
             'id' => $tokId,
-            'graphemes' => $graphemes
+            'graphemes' => $graphemes,
+            'lemma' => $tokenToLemma[$tokKey] ?? null,
+            'inflection' => $tokenToInflection[$tokKey] ?? null
         ];
     }
 }
 
-// 5. Extract Lines
+// 7. Extract Lines
 // Step 1: Get parent sequences where seq_type_id = 736
 $stmt = $pdo->query("
     SELECT seq_id, seq_entity_ids
@@ -343,7 +449,7 @@ foreach ($parentSequences as $parentSeqId => $entityIds) {
     }
 }
 
-// 6. Extract Editions
+// 8. Extract Editions
 $stmt = $pdo->query("
     SELECT edn_id, edn_description, edn_sequence_ids, edn_type_id, edn_owner_id, edn_text_id
     FROM edition
@@ -392,7 +498,7 @@ while ($row = $stmt->fetch()) {
     $targetData['editions'][] = $edition;
 }
 
-// 7. Extract Images
+// 9. Extract Images
 $stmt = $pdo->query("
     SELECT img_id, img_title, img_url, img_type_id
     FROM image
@@ -413,7 +519,7 @@ while ($row = $stmt->fetch()) {
     $imageIds[] = (int) $row['img_id'];
 }
 
-// 8. Extract Texts
+// 10. Extract Texts
 $stmt = $pdo->query("
     SELECT txt_id, txt_title, txt_ckn, txt_ref, txt_type_ids, txt_image_ids
     FROM text
