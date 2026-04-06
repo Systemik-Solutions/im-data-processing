@@ -18932,7 +18932,9 @@
             "type": "Analysis",
             "parent": null,
             "position": null,
-            "tokens": null
+            "tokens": null,
+            "translation": null,
+            "chaya": null
         },
         {
             "id": 53,
@@ -18940,7 +18942,9 @@
             "type": "Chapter",
             "parent": 6,
             "position": 1,
-            "tokens": null
+            "tokens": null,
+            "translation": null,
+            "chaya": null
         },
         {
             "id": 58,
@@ -18948,7 +18952,9 @@
             "type": "Section",
             "parent": 53,
             "position": 1,
-            "tokens": null
+            "tokens": null,
+            "translation": null,
+            "chaya": null
         },
         {
             "id": 59,
@@ -18956,7 +18962,9 @@
             "type": "Section",
             "parent": 53,
             "position": 2,
-            "tokens": null
+            "tokens": null,
+            "translation": null,
+            "chaya": null
         },
         {
             "id": 60,
@@ -18964,7 +18972,9 @@
             "type": "Section",
             "parent": 53,
             "position": 3,
-            "tokens": null
+            "tokens": null,
+            "translation": null,
+            "chaya": null
         },
         {
             "id": 68,
@@ -18972,7 +18982,9 @@
             "type": "Section",
             "parent": 53,
             "position": 5,
-            "tokens": null
+            "tokens": null,
+            "translation": null,
+            "chaya": null
         },
         {
             "id": 69,
@@ -18980,7 +18992,9 @@
             "type": "Section",
             "parent": 53,
             "position": 6,
-            "tokens": null
+            "tokens": null,
+            "translation": null,
+            "chaya": null
         },
         {
             "id": 70,
@@ -18992,7 +19006,9 @@
                 1,
                 2,
                 3
-            ]
+            ],
+            "translation": "[8] Thus I heard.",
+            "chaya": "[8] evam mayā śrutam"
         },
         {
             "id": 71,
@@ -19008,7 +19024,9 @@
                 8,
                 9,
                 10
-            ]
+            ],
+            "translation": "At one time the Bhagavat (*dwelt in Baraṇas̱i in the Deer Park at Hiṣ̱ivaḏaṇa.)",
+            "chaya": "ekam samayam bhagavān vārāṇasyām viharati r̥ṣipatane mr̥gadāve |"
         },
         {
             "id": 72,
@@ -19023,7 +19041,9 @@
                 14,
                 15,
                 16
-            ]
+            ],
+            "translation": "(*There the Bhagavat) [9] addressed the five monks:",
+            "chaya": "tatra khalu bhagavān [9] pañcakān bhikṣūn āmantrayasi (BHS) |"
         },
         {
             "id": 73,
@@ -19035,7 +19055,9 @@
                 17,
                 18,
                 19
-            ]
+            ],
+            "translation": "“(*Form), monks, is not-self.",
+            "chaya": "rūpam bhikṣavaḥ anātmā |"
         },
         {
             "id": 74,
@@ -19066,7 +19088,9 @@
                 39,
                 40,
                 41
-            ]
+            ],
+            "translation": "(*If, monks, this form were self), [10] this form would not lead to affliction [and] suffering, and it would be possible to obtain (*with regard to form) ‘[Let] form [11] be (*thus); [let] form be not thus.’",
+            "chaya": "rūpam idam bhikṣavaḥ ātmā abhaviṣyat [10] na idam rūpam ābādhāya duḥkhāya saṃvarteta labhyeta ca rūpe evam eva [11] rūpam bhavati (P hotu, Skt. bhavatu) evam rūpam mā bhūt (P ahosi) |"
         },
         {
             "id": 75,
@@ -19096,7 +19120,9 @@
                 60,
                 61,
                 62
-            ]
+            ],
+            "translation": "But since this form (*is not-self, therefore) [12] form leads to affliction [and] suffering and one does not obtain (*with regard to form ‘[Let] form) [13] be (*thus); let form be not thus.’”",
+            "chaya": "yasmāt idam rūpam anātmā tasmāt [12] rūpam ābādhāya duḥkhāya saṃvartate no ca labhate rūpe evam eva rūpam [13] bhavati evam rūpam mā bhūt (P ahosi) |"
         },
         {
             "id": 76,
@@ -19109,7 +19135,9 @@
                 64,
                 65,
                 66
-            ]
+            ],
+            "translation": "[14] So also feeling, perception, volitional formations.",
+            "chaya": "[14] ittham api vedanā saṃjñā saṃskārāḥ |"
         },
         {
             "id": 77,
@@ -19121,7 +19149,9 @@
                 67,
                 68,
                 69
-            ]
+            ],
+            "translation": "“Consciousness, monks, is not-self.",
+            "chaya": "vijñānam bhikṣavaḥ anātmā |"
         },
         {
             "id": 78,
@@ -19153,7 +19183,9 @@
                 90,
                 91,
                 92
-            ]
+            ],
+            "translation": "(*If, monks, this consciousness) [15] were self, this consciousness would not lead to affliction [and] suffering, (*and it would be possible to obtain with regard to consciousness) [16] ‘[Let] consciousness be thus; [let] consciousness be not thus.’",
+            "chaya": "vijñānam idam bhikṣavaḥ [15] ātmā abhaviṣyat na idam vijñānam ābādhāya duḥkhāya saṃvarteta labhyeta ca vijñāne [16] evam eva vijñānam bhavati evam eva vijñāne mā bhūt (P ahosi) |"
         },
         {
             "id": 79,
@@ -19185,7 +19217,9 @@
                 113,
                 114,
                 115
-            ]
+            ],
+            "translation": "(*But) since (*this consciousness is not-self), [17] therefore consciousness leads to affliction [and] suffering and one does not obtain with regard to consciousness [18] ‘[Let] consciousness be (*thus); [let] consciousness be not thus.’",
+            "chaya": "yasmāt idam vijñānam anātmā [17] tasmāt vijñānam ābādhāya duḥkhāya saṃvartate no ca labhate vijñāne evam eva [18] vijñānam bhavati evam eva vijñānam mā bhūt (P ahosi) ||"
         },
         {
             "id": 80,
@@ -19202,7 +19236,9 @@
                 121,
                 122,
                 123
-            ]
+            ],
+            "translation": "“What do you think, is form permanent or (*impermanent)?”  [19]",
+            "chaya": "tad kim manyatha rūpam nityam vā anityam [19] vā |"
         },
         {
             "id": 81,
@@ -19213,7 +19249,9 @@
             "tokens": [
                 124,
                 125
-            ]
+            ],
+            "translation": "“Impermanent, venerable sir.”",
+            "chaya": "anityam bhadanta |"
         },
         {
             "id": 82,
@@ -19228,7 +19266,9 @@
                 129,
                 130,
                 131
-            ]
+            ],
+            "translation": "“What is impermanent, is [that] suffering or happiness?”",
+            "chaya": "yad anityam duḥkham vā sukham vā |"
         },
         {
             "id": 83,
@@ -19240,7 +19280,9 @@
                 132,
                 133,
                 134
-            ]
+            ],
+            "translation": "“This is suffering, venerable sir.”",
+            "chaya": "duḥkham idam bhadanta |"
         },
         {
             "id": 84,
@@ -19267,7 +19309,9 @@
                 151,
                 152,
                 153
-            ]
+            ],
+            "translation": "“Again, what is (*impermanent), [20] suffering, [and] subject to change, is it suitable to regard [this thus] ‘This is mine; I am this; [21] this is my self?’”",
+            "chaya": "yad punar anityam [20] duḥkham vipariṇāmadharmam kalyam nu samanupaśyitum (BHS) eṣaḥ mama eṣaḥ aham [uncertain] asmi [21] etad me ātmā iti |"
         },
         {
             "id": 85,
@@ -19279,7 +19323,9 @@
                 154,
                 155,
                 156
-            ]
+            ],
+            "translation": "“This is not [suitable], venerable sir.”",
+            "chaya": "na u idam bhadanta |"
         },
         {
             "id": 86,
@@ -19296,7 +19342,9 @@
                 162,
                 163,
                 164
-            ]
+            ],
+            "translation": "“What do you think, is feeling permanent or impermanent?”",
+            "chaya": "tad kim manyatha vedanā nityā vā anityā vā |"
         },
         {
             "id": 87,
@@ -19308,7 +19356,9 @@
                 165,
                 166,
                 167
-            ]
+            ],
+            "translation": "“Surely impermanent, [22] venerable sir.”",
+            "chaya": "anityā [22] hi bhadanta |"
         },
         {
             "id": 88,
@@ -19324,7 +19374,9 @@
                 172,
                 173,
                 174
-            ]
+            ],
+            "translation": "“What is impermanent, is that suffering or happiness?”",
+            "chaya": "yad anityam duḥkham vā tad sukham vā |"
         },
         {
             "id": 89,
@@ -19336,7 +19388,9 @@
                 175,
                 176,
                 177
-            ]
+            ],
+            "translation": "“This is suffering, venerable sir.”",
+            "chaya": "duḥkham idam bhadanta |"
         },
         {
             "id": 90,
@@ -19364,7 +19418,9 @@
                 195,
                 196,
                 197
-            ]
+            ],
+            "translation": "“Again, what is impermanent, suffering, [23] [and] subject to change, is it suitable to regard this [thus] ‘This is mine; I am this; this is my self?’” [24]",
+            "chaya": "yad punar anityam duḥkham vipariṇāma[23]dharmam kalyam nu etad samanupaśyitum (BHS) eṣaḥ mama eṣaḥ aham [uncertain] asmi etad me ātmā [24] iti |"
         },
         {
             "id": 91,
@@ -19376,7 +19432,9 @@
                 198,
                 199,
                 200
-            ]
+            ],
+            "translation": "“Surely not, venerable sir.”",
+            "chaya": "no hi bhadanta |"
         },
         {
             "id": 92,
@@ -19389,7 +19447,9 @@
                 202,
                 203,
                 204
-            ]
+            ],
+            "translation": "So also perception, volitional formations, consciousness.",
+            "chaya": "ittham api saṃjñā saṃskārāḥ vijñānam ||"
         },
         {
             "id": 93,
@@ -19423,7 +19483,9 @@
                 232,
                 233,
                 234
-            ]
+            ],
+            "translation": "“(*Seeing thus, the well-taught), [25] noble disciple is disgusted with forms, disgusted with feeling, disgusted with perception, disgusted with (*volitional formations), [26] disgusted with consciousness; being disgusted, he is dispassionate; on account of dispassion, [his mind] is liberated; being liberated, [27] there is the knowledge ‘[my mind] is liberated.’",
+            "chaya": "evam paśyan śrutavān [25] āryaśrāvakaḥ rūpeṣu nirvidyate vedanāyām nirvidyate saṃjñāyām nirvidyate saṃskāre[26]ṣu nirvidyate vijñāne nirvidyate nirviṇṇaḥ virajyate virāgāt vimucyate vimukte [27] vimuktam evam jñānam bhavati |"
         },
         {
             "id": 94,
@@ -19445,7 +19507,9 @@
                 245,
                 246,
                 247
-            ]
+            ],
+            "translation": "He understands ‘[re]birth is destroyed; the holy life has been lived; what is to be done has been done by me; [28] there is no further state than this.’”",
+            "chaya": "kṣīṇā jāti uṣitam brahmacaryam kr̥tam mayā karaṇīyam [28] na aparam *ihatvam iti prajānāti ||"
         },
         {
             "id": 95,
@@ -19464,7 +19528,9 @@
                 255,
                 256,
                 257
-            ]
+            ],
+            "translation": "And while this exposition was being spoken, [29] the minds of the five monks were liberated from the taints through not clinging.",
+            "chaya": "asmin ca vyākaraṇe bhāṣyamāne [29] pañcakānām bhikṣūṇām anupādāya āsravebhyaḥ cittāni vimuktāni |"
         },
         {
             "id": 96,
@@ -19476,7 +19542,9 @@
                 258,
                 259,
                 260
-            ]
+            ],
+            "translation": "[30] The Bhagavat (*said) this.",
+            "chaya": "idam avocat [30] bhagavān |"
         },
         {
             "id": 97,
@@ -19488,7 +19556,9 @@
                 261,
                 262,
                 263
-            ]
+            ],
+            "translation": "Pleased, the five monks (*delighted at the speech of the Bhagavat).",
+            "chaya": "āttamanasaḥ pañcakāḥ bhikṣavaḥ ||"
         }
     ]
 }

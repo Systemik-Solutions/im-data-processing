@@ -661,6 +661,37 @@ while ($row = $stmt->fetch()) {
     ];
 }
 
+// Pre-fetch translation and chaya annotations for qualifying sequences
+$seqTranslation = [];
+$seqChaya = [];
+
+$stmt = $pdo->query("
+    SELECT ano_type_id, ano_linkfrom_ids, ano_text
+    FROM annotation
+    WHERE ano_type_id IN (761, 1421)
+      AND ano_linkfrom_ids IS NOT NULL
+    ORDER BY ano_id
+");
+
+while ($row = $stmt->fetch()) {
+    $typeId = (int) $row['ano_type_id'];
+    $linkFromIds = parsePostgresArray($row['ano_linkfrom_ids']);
+
+    foreach ($linkFromIds as $link) {
+        $link = trim($link);
+        if (preg_match('/^seq:(\d+)$/', $link, $matches)) {
+            $seqId = (int) $matches[1];
+            if (isset($qualifyingSequences[$seqId]) && $row['ano_text'] !== null) {
+                if ($typeId === 761) {
+                    $seqTranslation[$seqId][] = $row['ano_text'];
+                } elseif ($typeId === 1421) {
+                    $seqChaya[$seqId][] = $row['ano_text'];
+                }
+            }
+        }
+    }
+}
+
 // Pass 2: Build reverse index for parent/position resolution
 $childToParent = [];
 
@@ -693,7 +724,9 @@ foreach ($qualifyingSequences as $seqId => $seqData) {
         'type' => $seqData['type'],
         'parent' => $parent,
         'position' => $position,
-        'tokens' => $seqData['tokens']
+        'tokens' => $seqData['tokens'],
+        'translation' => isset($seqTranslation[$seqId]) ? implode('; ', $seqTranslation[$seqId]) : null,
+        'chaya' => isset($seqChaya[$seqId]) ? implode('; ', $seqChaya[$seqId]) : null
     ];
 }
 
