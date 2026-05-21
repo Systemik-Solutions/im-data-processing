@@ -93,10 +93,11 @@ For example:
 #### 3. Segments
 
 Get the list of segments from the `syllablecluster` table joining the `segment` table on the 
-`scl_segment_id` column. Then add each segment to the `segments` array in the target data. Each segment 
+`scl_segment_id` column and the `baseline` table on the `seg_baseline_ids` column. Note that the `seg_baseline_ids` is an array type column and use the first value for the join. Then add each segment to the `segments` array in the target data. Each segment 
 object should have the following properties:
 
 - `id`: the `scl_id` column as is.
+- `image`: the `bln_image_id` column from the joined `baseline` table as is.
 - `graphemes`: the `scl_grapheme_ids` column. This column is an array of grapheme ids. Firstly validate
 each id in the array to make sure it exists in the `annotatedGraphemes` array in the target data. If it 
 is valid, add it to the `graphemes` property array. Otherwise, skip it.
@@ -110,6 +111,7 @@ For example:
 ```json
 {
     "id": 1,
+    "image": 1,
     "graphemes": [1, 2],
     "clarity": "5",
     "obscurations": "Scratch",
@@ -319,7 +321,7 @@ For example:
 
 #### 9. Sequences
 
-Get the list of sequences from the `sequence` table where `seq_entity_ids` is not null. Another condition is that only include sequences where the resolved type term based on the `seq_type_id` is below the hierarchy of "Analysis" (trm_id = 740) in the `term` (including the "Analysis" term itself). For example, a sequence with type "Sentence" (trm_id = 745) is in the hierarchy (bottom-to-top) defined by the `trm_parent_id` column: "Paragraph" (trm_id = 744) -> "Section" (trm_id = 1437) -> "Chapter" (trm_id = 741) -> "Analysis" (trm_id = 740). Then add each sequence to the `sequences` array in the target data. Each sequence object should have the following properties:
+Get the list of sequences from the `sequence` table where `seq_entity_ids` is not null. Another condition is that only include sequences where the resolved type term based on the `seq_type_id` is below the hierarchy of "Analysis" (trm_id = 740) in the `term` (excluding the "Analysis" term itself). For example, a sequence with type "Sentence" (trm_id = 745) is in the hierarchy (bottom-to-top) defined by the `trm_parent_id` column: "Paragraph" (trm_id = 744) -> "Section" (trm_id = 1437) -> "Chapter" (trm_id = 741) -> "Analysis" (trm_id = 740). Then add each sequence (excluding the "Analysis" sequence itself) to the `sequences` array in the target data. Each sequence object should have the following properties:
 
 - `id`: the `seq_id` column as is.
 - `label`: the `seq_label` column as is.

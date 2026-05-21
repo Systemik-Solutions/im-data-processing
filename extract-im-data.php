@@ -203,11 +203,13 @@ while ($row = $stmt->fetch()) {
 
 // 3. Extract Segments
 $stmt = $pdo->query("
-    SELECT 
+    SELECT
         scl.scl_id, scl.scl_grapheme_ids,
-        seg.seg_clarity_id, seg.seg_obscurations, seg.seg_image_pos
+        seg.seg_clarity_id, seg.seg_obscurations, seg.seg_image_pos,
+        bln.bln_image_id
     FROM syllablecluster scl
     JOIN segment seg ON scl.scl_segment_id = seg.seg_id
+    LEFT JOIN baseline bln ON bln.bln_id = (seg.seg_baseline_ids)[1]
     ORDER BY scl.scl_id
 ");
 
@@ -226,6 +228,7 @@ while ($row = $stmt->fetch()) {
 
     $segment = [
         'id' => (int) $row['scl_id'],
+        'image' => $row['bln_image_id'] !== null ? (int) $row['bln_image_id'] : null,
         'graphemes' => $validGraphemes,
         'clarity' => getTermLabel($pdo, $row['seg_clarity_id']),
         'obscurations' => $row['seg_obscurations'],
@@ -610,9 +613,10 @@ foreach ($targetData['tokens'] as $token) {
     $validTokenIds[$token['id']] = true;
 }
 
-// Get all term IDs that are descendants of "Analysis" (trm_id = 740), including 740 itself
+// Get all term IDs that are descendants of "Analysis" (trm_id = 740), excluding 740 itself
 $analysisTermIds = getDescendantTermIds($pdo, 740);
 $analysisTermSet = array_flip($analysisTermIds);
+unset($analysisTermSet[740]);
 
 // Query all sequences with non-null entity IDs
 $stmt = $pdo->query("
